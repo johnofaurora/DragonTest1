@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.IO;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 
 namespace DragonTest1
 {
@@ -18,13 +19,19 @@ namespace DragonTest1
         public Form1()
         {
             InitializeComponent();
+            RegexDictionary = new Dictionary<string, string>(3);
+            RegexDictionary.Add(@"\*\*\*", "blank");
+            RegexDictionary.Add(@"\[.+\]", "choice");
+            RegexDictionary.Add(@"\{\*.+\*\}", "comment");
         }
+
+        Dictionary<string, string> RegexDictionary;
 
         [DllImport("user32.dll")]
         private static extern bool SetForegroundWindow(IntPtr hWnd);
         //comment
 
-        string placeholder = "***";
+        //string placeholder = "***";
 
         private void loadTemplateToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -43,27 +50,28 @@ namespace DragonTest1
                     MessageBox.Show("File could not be read");
                     return;
                 }
-                nextToolStripMenuItem_Click(sender, e);
+                //nextToolStripMenuItem_Click(sender, e);
             }
         }
 
         private void nextToolStripMenuItem_Click(object sender, EventArgs e)
         {
             int cursPos = textBox1.SelectionStart;
-            int nextIndex = textBox1.Text.IndexOf(placeholder, cursPos); //if curently at a ***, won't move past
-            if (nextIndex < 0) 
+            Tuple<Match, string> result = regexFind(textBox1.Text, RegexDictionary, cursPos);
+            if (result.Item2 == "no match")
             {
                 cursPos = 0;
-                nextIndex = textBox1.Text.IndexOf(placeholder, cursPos);
-                if (nextIndex < 0)
+                result = regexFind(textBox1.Text, RegexDictionary, cursPos);
+                if (result.Item2 == "no match")
                 {
-                    nextIndex = 0;
-                    MessageBox.Show("End of template reached. \rNo \"" + placeholder +"\" detected.");
+                    MessageBox.Show("End of template reached. \rNo placeholders detected.");
+                    return;
                 }
             }
-            //MessageBox.Show(cursPos.ToString() + "   " + nextIndex.ToString()); 
-            textBox1.SelectionStart = nextIndex;
-            textBox1.SelectionLength = placeholder.Length;
+            textBox1.SelectionStart = result.Item1.Index;
+            textBox1.SelectionLength = result.Item1.Length;
+            textBox1.ScrollToCaret();
+
         }
 
         private void textBox1_KeyDown(object sender, KeyEventArgs e)
@@ -100,6 +108,32 @@ namespace DragonTest1
             }
         }
 
+
+        private Tuple<Match, string> regexFind(string text, Dictionary<string, string> regexDictionary, int startPosition)
+        {
+            Match bestMatch = Regex.Match("", "");
+            int bestIndex = int.MaxValue;
+            string bestType = "no match";
+
+            foreach (string k in regexDictionary.Keys)
+            {
+                Match m = Regex.Match(text, k);
+                while (m.Success)
+                {
+                    if (m.Index < bestIndex && m.Index > startPosition)
+                    {
+                        bestIndex = m.Index;
+                        bestMatch = m;
+                        bestType = regexDictionary[k];
+                    }
+                    m = m.NextMatch();
+                }
+
+            }
+
+            return new Tuple<Match, string>(bestMatch, bestType);
+
+        }
 
     }
 }
