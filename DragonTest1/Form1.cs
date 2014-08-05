@@ -22,7 +22,7 @@ namespace DragonTest1
             RegexDictionary = new Dictionary<string, string>(3);
             RegexDictionary.Add(@"\*\*\*", "blank");
             RegexDictionary.Add(@"\[.+\]", "choice");
-            RegexDictionary.Add(@"\{\*.+\*\}", "comment");
+            //RegexDictionary.Add(@"\{\*.+\*\}", "comment");
         }
 
         Dictionary<string, string> RegexDictionary;
@@ -56,7 +56,7 @@ namespace DragonTest1
 
         private void nextToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            int cursPos = textBox1.SelectionStart;
+            int cursPos = textBox1.SelectionStart + textBox1.SelectionLength;
             Tuple<Match, string> result = regexFind(textBox1.Text, RegexDictionary, cursPos);
             if (result.Item2 == "no match")
             {
@@ -68,8 +68,26 @@ namespace DragonTest1
                     return;
                 }
             }
-            textBox1.SelectionStart = result.Item1.Index;
-            textBox1.SelectionLength = result.Item1.Length;
+            else if (result.Item2 == "blank")
+            {
+                textBox1.SelectionStart = result.Item1.Index;
+                textBox1.SelectionLength = result.Item1.Length;
+            }
+            else if (result.Item2 == "choice")
+            {
+                //MessageBox.Show("select things here");
+
+                textBox1.SelectionStart = result.Item1.Index;
+                textBox1.SelectionLength = result.Item1.Length;
+
+                string[] choices = result.Item1.Value.Trim(new Char[] {' ',  '[', ']'}).Split(new Char[] {'|'});
+                SelectionForm sf = new SelectionForm(choices);
+                if (sf.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    textBox1.SelectedText = sf.selection;
+                }
+            }
+
             textBox1.ScrollToCaret();
 
         }
