@@ -21,7 +21,7 @@ namespace DragonTest1
             InitializeComponent();
             RegexDictionary = new Dictionary<string, string>(3);
             RegexDictionary.Add(@"\*\*\*", "blank");
-            RegexDictionary.Add(@"\[.+\]", "choice");
+            RegexDictionary.Add(@"\[[^\]]+\]", "choice");
             //RegexDictionary.Add(@"\{\*.+\*\}", "comment");
         }
 
@@ -42,7 +42,8 @@ namespace DragonTest1
                     using (StreamReader sr = new StreamReader(openFileDialog1.FileName))
                     {
                         String line = sr.ReadToEnd();
-                        textBox1.Text = line;
+                        richTextBox1.Text = line;
+
                     }
                 }
                 catch (Exception err)
@@ -56,12 +57,12 @@ namespace DragonTest1
 
         private void nextToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            int cursPos = textBox1.SelectionStart + textBox1.SelectionLength;
-            Tuple<Match, string> result = regexFind(textBox1.Text, RegexDictionary, cursPos);
+            int cursPos = richTextBox1.SelectionStart + richTextBox1.SelectionLength;
+            Tuple<Match, string> result = regexFind(richTextBox1.Text, RegexDictionary, cursPos);
             if (result.Item2 == "no match")
             {
                 cursPos = 0;
-                result = regexFind(textBox1.Text, RegexDictionary, cursPos);
+                result = regexFind(richTextBox1.Text, RegexDictionary, cursPos);
                 if (result.Item2 == "no match")
                 {
                     MessageBox.Show("End of template reached. \rNo placeholders detected.");
@@ -70,29 +71,37 @@ namespace DragonTest1
             }
             else if (result.Item2 == "blank")
             {
-                textBox1.SelectionStart = result.Item1.Index;
-                textBox1.SelectionLength = result.Item1.Length;
+                richTextBox1.SelectionStart = result.Item1.Index;
+                richTextBox1.SelectionLength = result.Item1.Length;
             }
             else if (result.Item2 == "choice")
             {
                 //MessageBox.Show("select things here");
 
-                textBox1.SelectionStart = result.Item1.Index;
-                textBox1.SelectionLength = result.Item1.Length;
+                richTextBox1.SelectionStart = result.Item1.Index;
+                richTextBox1.SelectionLength = result.Item1.Length;
 
+                
                 string[] choices = result.Item1.Value.Trim(new Char[] {' ',  '[', ']'}).Split(new Char[] {'|'});
                 SelectionForm sf = new SelectionForm(choices);
                 if (sf.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
-                    textBox1.SelectedText = sf.selection;
+                    richTextBox1.SelectedText = sf.selection;
+
+                    if (sf.selection.Contains("***"))
+                    {
+                        richTextBox1.SelectionStart = Math.Max(result.Item1.Index - 1, 0);
+                        nextToolStripMenuItem_Click(sender, e);
+                    }
                 }
             }
 
-            textBox1.ScrollToCaret();
+            richTextBox1.ScrollToCaret();
+  
 
         }
 
-        private void textBox1_KeyDown(object sender, KeyEventArgs e)
+        private void richTextBox1_KeyDown(object sender, KeyEventArgs e)
         {
             //MessageBox.Show(e.KeyData.ToString());
             if (e.KeyData.ToString() == "F1")
@@ -118,7 +127,15 @@ namespace DragonTest1
             {
                 //MessageBox.Show("found something");
                 SetForegroundWindow(prc[0].MainWindowHandle);
-                SendKeys.Send(textBox1.Text);
+                string[] lines = cleanString(richTextBox1.Text).Split(new char[] {'\n'});
+                foreach(string line in lines)
+                {
+                    SendKeys.Send(line);
+                    SendKeys.Send("{ENTER}");
+
+                }
+
+                //SendKeys.Send(richTextBox1.Text);
             }
             else
             {
@@ -151,6 +168,19 @@ namespace DragonTest1
 
             return new Tuple<Match, string>(bestMatch, bestType);
 
+        }
+
+        private string cleanString(string text)
+        {
+            text = text.Replace("+", "{+}");
+            text = text.Replace("^", "{^}");
+            text = text.Replace("%", "{%}");
+            text = text.Replace("~", "{~}");
+            text = text.Replace("(", "{(}");
+            text = text.Replace(")", "{)}");
+            text = text.Replace("[", "{[}");
+            text = text.Replace("]", "{]}");
+            return text;
         }
 
     }
