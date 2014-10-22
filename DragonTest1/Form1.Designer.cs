@@ -32,8 +32,11 @@
             this.loadTemplateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.nextToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.copyToCernerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.scanReqToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
+            this.saveToFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -42,7 +45,9 @@
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.loadTemplateToolStripMenuItem,
             this.nextToolStripMenuItem,
-            this.copyToCernerToolStripMenuItem});
+            this.copyToCernerToolStripMenuItem,
+            this.scanReqToolStripMenuItem,
+            this.saveToFileToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(934, 24);
@@ -70,6 +75,13 @@
             this.copyToCernerToolStripMenuItem.Text = "Copy To Cerner";
             this.copyToCernerToolStripMenuItem.Click += new System.EventHandler(this.copyToCernerToolStripMenuItem_Click);
             // 
+            // scanReqToolStripMenuItem
+            // 
+            this.scanReqToolStripMenuItem.Name = "scanReqToolStripMenuItem";
+            this.scanReqToolStripMenuItem.Size = new System.Drawing.Size(67, 20);
+            this.scanReqToolStripMenuItem.Text = "Scan Req";
+            this.scanReqToolStripMenuItem.Click += new System.EventHandler(this.scanReqToolStripMenuItem_Click);
+            // 
             // openFileDialog1
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
@@ -84,6 +96,13 @@
             this.richTextBox1.TabIndex = 1;
             this.richTextBox1.Text = "";
             this.richTextBox1.KeyUp += new System.Windows.Forms.KeyEventHandler(this.richTextBox1_KeyDown);
+            // 
+            // saveToFileToolStripMenuItem
+            // 
+            this.saveToFileToolStripMenuItem.Name = "saveToFileToolStripMenuItem";
+            this.saveToFileToolStripMenuItem.Size = new System.Drawing.Size(78, 20);
+            this.saveToFileToolStripMenuItem.Text = "Save to File";
+            this.saveToFileToolStripMenuItem.Click += new System.EventHandler(this.saveToFileToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -110,6 +129,9 @@
         private System.Windows.Forms.ToolStripMenuItem nextToolStripMenuItem;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.RichTextBox richTextBox1;
+        private System.Windows.Forms.ToolStripMenuItem scanReqToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem saveToFileToolStripMenuItem;
+        private System.Windows.Forms.SaveFileDialog saveFileDialog1;
     }
 }
 
